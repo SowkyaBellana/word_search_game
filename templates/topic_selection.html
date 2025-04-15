@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Topic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/topic_selection.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2>TOPICS</h2>
+        <div class="grid">
+            {% for topic, display in [
+                ('Fruits', 'Fruits'), ('Foods', 'Foods'), ('Drinks', 'Drinks'),
+                ('Plants', 'Plants'), ('Animals', 'Animals'), ('IT', 'IT'),
+                ('Subjects', 'Subjects'), ('Actors', 'Actors'), ('Movies', 'Movies'),
+                ('Musicians', 'Musicians'), ('Gods', 'Devotees'), ('Temples', 'Temples'),
+                ('Festivals', 'Festivals'), ('Countries', 'Countries'), ('Tourism', 'Tourism')
+            ] %}
+            <form action="/select-difficulty" method="POST">
+                <input type="hidden" name="topic" value="{{ topic }}">
+                <button type="submit">{{ display }}</button>
+            </form>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+

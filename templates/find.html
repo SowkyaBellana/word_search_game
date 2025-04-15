@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Words</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>Find Words</h1>
+    <pre id="wordGrid"></pre>
+    <input type="text" id="guessInput" placeholder="Enter word">
+    <button onclick="sendGuess()">Guess</button>
+    <button onclick="requestHint()">Hint</button>
+    <p id="hintDisplay"></p>
+
+    <script>
+        const socket = io("http://127.0.0.1:5002");
+
+        function sendGuess() {
+            const guess = document.getElementById("guessInput").value;
+            socket.emit("finder_guess", guess);
+        }
+
+        socket.on("word_grid", (data) => {
+            document.getElementById("wordGrid").innerText = data.grid.join("\n");
+            alert("Words to find: " + data.words.join(", "));
+        });
+
+        socket.on("correct_guess", (word) => {
+            alert("Correct! " + word);
+        });
+
+        socket.on("wrong_guess", (word) => {
+            alert("Wrong! Try again.");
+        });
+
+        function requestHint() {
+            socket.emit("request_hint");
+        }
+
+        socket.on("hint_request", () => {
+            const hint = prompt("Enter a hint for the Finder:");
+            socket.emit("send_hint", hint);
+        });
+
+        socket.on("receive_hint", (hint) => {
+            document.getElementById("hintDisplay").innerText = "Hint: " + hint;
+        });
+
+        socket.on("message", (msg) => {
+            alert(msg);
+        });
+    </script>
+</body>
+</html>

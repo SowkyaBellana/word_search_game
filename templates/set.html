@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Words</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>Set Words</h1>
+    <input type="text" id="wordInput" placeholder="Enter words (comma-separated)">
+    <button onclick="sendWords()">Submit</button>
+
+    <script>
+        const socket = io("http://127.0.0.1:5002");
+
+        function sendWords() {
+            const words = document.getElementById("wordInput").value.split(",");
+            socket.emit("set_words", words);
+            alert("Words sent to finder.");
+        }
+
+        socket.on("message", (msg) => {
+            alert(msg);
+        });
+    </script>
+</body>
+</html>

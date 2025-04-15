@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word Search Game</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <h2>Multiplayer Word Search Game</h2>
+    <div id="output"></div>
+    <input id="input" type="text" placeholder="Type here...">
+    <button onclick="send()">Send</button>
+
+    <script>
+        const socket = io();
+        let username = prompt("Enter your name:");
+        socket.emit('join', {username: username});
+
+        socket.on('status', (data) => {
+            document.getElementById('output').innerText += data.msg + '\n';
+        });
+
+        socket.on('choose_role', () => {
+            let choice = prompt("Do you want to set words or find words? (set/find)");
+            if (choice === "set") {
+                let word_input = prompt("Enter words separated by comma:");
+                socket.emit('set_words', {words: word_input.split(",")});
+            }
+        });
+
+        socket.on('show_grid', (data) => {
+            document.getElementById('output').innerText += "\n" + data.grid + "\n";
+        });
+
+        socket.on('result', (data) => {
+            document.getElementById('output').innerText += data.msg + '\n';
+        });
+
+        socket.on('hint_msg', (data) => {
+            alert("Hint: " + data.msg);
+        });
+
+        function send() {
+            const val = document.getElementById('input').value;
+            if (val.toLowerCase() === "hint") {
+                const h = prompt("Enter hint to send:");
+                socket.emit('hint', {hint: h});
+            } else {
+                socket.emit('guess', {guess: val});
+            }
+            document.getElementById('input').value = "";
+        }
+    </script>
+</body>
+</html>

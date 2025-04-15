@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+</head>
+<body>
+    <div class="results-container">
+        <h1>Game Results</h1>
+        
+        <div class="result-item">
+            <p>Topic: <span id="topic">{{ topic }}</span></p>
+            <p>Difficulty: <span id="difficulty">{{ difficulty }}</span></p>
+        </div>
+        
+        <div class="result-item">
+            <p>Words Found:</p>
+            <p class="score"><span id="words-found">{{ words_found }}</span>/<span id="total-words">{{ total_words }}</span></p>
+        </div>
+        
+        <div class="result-item">
+            <p>Time Taken:</p>
+            <p class="score"><span id="time-used">{{ time_used }}</span> seconds</p>
+        </div>
+        
+        <div class="result-item">
+            <p>Date: <span id="date">{{ date }}</span></p>
+        </div>
+        
+        <button class="btn" onclick="window.location.href='/topic_selection'">Play Again</button>
+        <button class="btn" onclick="window.location.href='/login'">Logout</button>
+    </div>
+</body>
+</html>

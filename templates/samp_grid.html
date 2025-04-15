@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Search Game</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/samp_grid.css') }}">
+  <style>
+    .unfound {
+      color: #e74c3c;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    .unfound-glow {
+      animation: glow 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 5px 2px rgba(255, 0, 0, 0.5);
+        background-color: rgba(255, 0, 0, 0.3);
+      }
+      to {
+        box-shadow: 0 0 10px 4px rgba(255, 0, 0, 0.7);
+        background-color: rgba(255, 0, 0, 0.5);
+      }
+    }
+    
+    .found {
+      background-color: rgba(46, 204, 113, 0.3);
+    }
+    </style>
+</head>
+<body>
+    <button onclick="window.location.href='/topic_selection'" class="quit-button">
+        Quit Game
+    </button>
+
+  <div class="game-info">
+    <h2>Word Search Game</h2>
+    <p>Topic: {{ topic }} | Difficulty: {{ difficulty }}</p>
+    <div class="timer" id="timer">Time Left: 05:00</div>
+  </div>
+
+  <div id="selected-word">Selected Word: </div>
+  <div id="congrats-message" class="congrats-message">Congratulations! You found all words!</div>
+
+  <div class="game-container">
+    <div id="grid-container" style="grid-template-columns: repeat({{ grid[0] | length }}, 40px);">
+      {% for row_index in range(grid | length) %}
+        <div class="grid-row">
+          {% for col_index in range(grid[row_index] | length) %}
+            <div class="cell" data-row="{{ row_index }}" data-col="{{ col_index }}">
+              {{ grid[row_index][col_index] }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="word-list-container">
+      <h3>Find These Words</h3>
+      <ul id="word-list">
+        {% for word in words %}
+          <li class="word-item">{{ word }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cells = document.querySelectorAll(".cell");
+      let isMouseDown = false;
+      let selectedCells = [];
+
+      const wordCoords = {{ word_coords | tojson }};
+
+      cells.forEach(cell => {
+        cell.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          isMouseDown = true;
+          resetSelection();
+          selectCell(cell);
+        });
+
+        cell.addEventListener("mouseenter", () => {
+          if (isMouseDown) selectCell(cell);
+        });
+
+        cell.addEventListener("mouseup", () => {
+          isMouseDown = false;
+          checkSelectedWord();
+        });
+      });
+
+      document.body.addEventListener("mouseup", () => {
+        if (isMouseDown) {
+          isMouseDown = false;
+          checkSelectedWord();
+        }
+      });
+
+      function selectCell(cell) {
+        if (!selectedCells.includes(cell)) {
+          cell.classList.add("selected");
+          selectedCells.push(cell);
+          updateSelectedWord();
+        }
+      }
+
+      function resetSelection() {
+        selectedCells.forEach(cell => cell.classList.remove("selected"));
+        selectedCells = [];
+        updateSelectedWord();
+      }
+
+      function updateSelectedWord() {
+        const word = selectedCells.map(cell => cell.textContent.trim()).join("");
+        document.getElementById("selected-word").textContent = `Selected Word: ${word}`;
+      }
+
+      function checkSelectedWord() {
+        const word = selectedCells.map(cell => cell.textContent.trim()).join("").toLowerCase();
+        const wordListItems = document.querySelectorAll("#word-list .word-item");
+
+        wordListItems.forEach(item => {
+          if (item.textContent.toLowerCase() === word && !item.classList.contains("found")) {
+            item.classList.add("found");
+            // Mark all cells in this word as found
+            const wordKey = item.textContent.toLowerCase();
+            if (wordCoords[wordKey]) {
+              wordCoords[wordKey].forEach(([row, col]) => {
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                if (cell) {
+                  cell.classList.add("found");
+                }
+              });
+            }
+          }
+        });
+
+        resetSelection();
+        checkGameCompletion();
+      }
+
+      function checkGameCompletion() {
+        const allWords = document.querySelectorAll("#word-list .word-item");
+        const foundWords = document.querySelectorAll("#word-list .word-item.found");
+
+        if (allWords.length === foundWords.length) {
+          document.getElementById("congrats-message").style.display = "block";
+          highlightUnfoundWords();
+        }
+      }
+
+      function highlightUnfoundWords() {
+        const wordListItems = document.querySelectorAll("#word-list .word-item");
+        wordListItems.forEach(item => {
+          if (!item.classList.contains("found")) {
+            item.classList.add("unfound");
+            const word = item.textContent.toLowerCase();
+            if (wordCoords[word]) {
+              wordCoords[word].forEach(([row, col]) => {
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                if (cell && !cell.classList.contains("found")) {
+                  cell.classList.add("unfound-glow");
+                }
+              });
+            }
+          }
+        });
+      }
+
+      let timeLeft = 10; // 5 minutes in seconds
+      const timerElement = document.getElementById("timer");
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `Time Left: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+
+      function startTimer() {
+        updateTimerDisplay();
+        const timerInterval = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay();
+
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            highlightUnfoundWords(); // Highlight unfound words when time runs out
+            setTimeout(() => {
+              alert("⏰ Time's up!");
+              window.location.href = "/results?timeout=true";
+            }, 500);
+          }
+        }, 1000);
+      }
+
+      startTimer();
+    });
+  </script>
+</body>
+</html>

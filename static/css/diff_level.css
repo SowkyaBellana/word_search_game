@@ -1,0 +1,100 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1e272e, #2d3436);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 1s ease;
+}
+
+.container {
+    background: #2f3640;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    width: 90%;
+    max-width: 700px;
+    animation: slideIn 0.8s ease-out;
+}
+
+h2 {
+    font-size: 40px;
+    color: #00cec9;
+    margin-bottom: 10px;
+}
+
+.highlight {
+    color: #74b9ff;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 30px;
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+/* Horizontal arrangement */
+.difficulty-options {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+/* Circular buttons */
+.circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 80%;
+    font-size: 30px;
+    font-weight: bold;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Unique colors per difficulty */
+.easy {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+}
+.easy:hover {
+    background: linear-gradient(135deg, #00cec9, #00e6d2);
+    transform: scale(1.1);
+}
+
+.medium {
+    background: linear-gradient(135deg, #0984e3, #6c5ce7);
+}
+.medium:hover {
+    background: linear-gradient(135deg, #74b9ff, #7a66f1);
+    transform: scale(1.1);
+}
+
+.hard {
+    background: linear-gradient(135deg, #d63031, #e17055);
+}
+.hard:hover {
+    background: linear-gradient(135deg, #ff7675, #fab1a0);
+    transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
